@@ -34,6 +34,7 @@ struct SourceAddress;
 
 using CCNamePair = std::pair<uint16_t, std::string>;
 using NoteNamePair = std::pair<uint8_t, std::string>;
+using SampleTriggerCallback = void (*)(void*, int, int, int, const char*, int, int);
 
 /**
  * @brief This class is the core of the sfizz library. In C++ it is the main point
@@ -717,6 +718,9 @@ public:
      * @return int
      */
     int getNumActiveVoices() const noexcept;
+
+    /** Install a real-time-safe observer for voices started by Note On events. */
+    void setSampleTriggerCallback(SampleTriggerCallback callback, void* userData) noexcept;
 
     /**
      * @brief Get the active voices as a view

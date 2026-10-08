@@ -413,6 +413,8 @@ struct Synth::Impl final: public Parser::Listener {
     // MIDI transport normalization and all Lower-Zone MPE profile policy.
     // Core expression dispatch and voices consume only resolved targets.
     MidiInputAdapter midiInputAdapter_;
+    SampleTriggerCallback sampleTriggerCallback_ { nullptr };
+    void* sampleTriggerUserData_ { nullptr };
 };
 
 } // namespace sfz

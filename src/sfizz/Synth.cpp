@@ -1083,6 +1083,12 @@ int Synth::getNumActiveVoices() const noexcept
     return (config::overflowVoiceMultiplier > 1) ? std::min(impl.numVoices_, activeVoices) : activeVoices;
 }
 
+void Synth::setSampleTriggerCallback(SampleTriggerCallback callback, void* userData) noexcept
+{
+    impl_->sampleTriggerCallback_ = callback;
+    impl_->sampleTriggerUserData_ = userData;
+}
+
 std::vector<const Voice*> Synth::getActiveVoices() const noexcept
 {
     Impl& impl = *impl_;
@@ -1433,8 +1439,16 @@ void Synth::Impl::startVoice(Layer* layer, int delay, const TriggerEvent& trigge
     selectedVoice->reset();
     TriggerEvent resolvedTrigger = triggerEvent;
     resolvedTrigger.expressionTarget = midiInputAdapter_.noteBroadTarget(triggerEvent.source);
-    if (selectedVoice->startVoice(layer, delay, resolvedTrigger))
+    if (selectedVoice->startVoice(layer, delay, resolvedTrigger)) {
         ring.addVoiceToRing(selectedVoice);
+        if (sampleTriggerCallback_ && triggerEvent.type == TriggerEventType::NoteOn) {
+            sampleTriggerCallback_(sampleTriggerUserData_, triggerEvent.number,
+                static_cast<int>(triggerEvent.value * 127.0f + 0.5f),
+                region.getId().number(),
+                region.sampleId->filename().c_str(), region.sequencePosition,
+                region.sequenceLength);
+        }
+    }
 }
 
 void Synth::Impl::checkOffGroups(const Region* region, int delay, int number,

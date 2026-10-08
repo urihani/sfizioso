@@ -114,6 +114,12 @@ int sfizz_get_num_active_voices(sfizz_synth_t* synth)
     return synth->synth.getNumActiveVoices();
 }
 
+void sfizz_set_sample_trigger_callback(sfizz_synth_t* synth,
+    sfizz_sample_trigger_t* callback, void* user_data)
+{
+    synth->synth.setSampleTriggerCallback(callback, user_data);
+}
+
 void sfizz_set_samples_per_block(sfizz_synth_t* synth, int samples_per_block)
 {
     synth->synth.setSamplesPerBlock(samples_per_block);

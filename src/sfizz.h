@@ -68,6 +68,8 @@ typedef struct sfizz_synth_t sfizz_synth_t;
  * Return false to let sfizz fall back to normal disk reads.
  */
 typedef bool (sfizz_sample_reader_t)(void* user_data, const char* path, const void** data, size_t* size);
+typedef void (sfizz_sample_trigger_t)(void* user_data, int note_number, int velocity,
+    int region_id, const char* sample, int sequence_position, int sequence_length);
 
 /**
  * @brief Oversampling factor
@@ -325,6 +327,15 @@ SFIZZ_EXPORTED_API size_t sfizz_get_num_preloaded_samples(sfizz_synth_t* synth);
  * @param synth  The synth.
  */
 SFIZZ_EXPORTED_API int sfizz_get_num_active_voices(sfizz_synth_t* synth);
+
+/**
+ * @brief Observe SFZ voices started by Note On events.
+ *
+ * The callback runs on the real-time audio thread. It must not block, allocate,
+ * or call back into the synth. Passing a null callback disables observation.
+ */
+SFIZZ_EXPORTED_API void sfizz_set_sample_trigger_callback(sfizz_synth_t* synth,
+    sfizz_sample_trigger_t* callback, void* user_data);
 
 /**
  * @brief Set the expected number of samples per block.
